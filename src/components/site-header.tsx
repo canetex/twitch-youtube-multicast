@@ -1,12 +1,13 @@
 import Link from "next/link";
 
 import { CopyShareButton } from "@/components/copy-share-button";
+import type { CopyShareProps } from "@/components/copy-share-button";
 
 export function SiteHeader({
-  share_url,
+  copy_share,
   show_back_home,
 }: {
-  share_url?: string | null;
+  copy_share?: CopyShareProps | null;
   show_back_home?: boolean;
 }) {
   return (
@@ -34,7 +35,7 @@ export function SiteHeader({
               Voltar aos times
             </Link>
           ) : null}
-          {share_url ? <CopyShareButton url={share_url} /> : null}
+          {copy_share ? <CopyShareButton {...copy_share} /> : null}
         </div>
       </div>
     </header>

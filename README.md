@@ -5,7 +5,7 @@ Aplicação web para cadastrar **times**, associar **streams** (Twitch ou YouTub
 ## Funcionalidades
 
 - **Cadastro**: criar times e adicionar URLs de Twitch / YouTube por jogador (`/cadastro`).
-- **Link público**: slug único em `/compartilhar/[slug]` com o mesmo mosaico da página inicial (botão “Copiar link público” no cabeçalho).
+- **Link do mosaico**: botão **“Copiar link do mosaico”** chama `POST /api/share/publish`, grava um snapshot com **todos os times e streams** e devolve um URL curto `/compartilhar/mosaico/[token]` que carrega esse mosaico pré-configurado (links internos usam `?snapshot=` quando necessário). A rota `/compartilhar/[slug]` continua disponível como vista ao vivo do slug da instalação.
 - **Início** (`/`): todos os times em seções; cada seção é um mosaico de players.
 - **Time** (`/equipe/[id]`): apenas as streams daquele time.
 - **Foco** (`/ver/[teamId]/[streamId]`): stream principal em destaque; na barra inferior, as outras streams do mesmo time em mosaico horizontal.

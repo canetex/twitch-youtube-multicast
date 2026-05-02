@@ -16,13 +16,20 @@ export function WatchExperience({
   team_name,
   active_stream_id,
   streams,
+  snapshot_token,
 }: {
   team_id: string;
   team_name: string;
   active_stream_id: string;
   streams: WatchStream[];
+  snapshot_token?: string;
 }) {
   const router = useRouter();
+  const snapshot_qs =
+    snapshot_token !== undefined && snapshot_token !== ""
+      ? `?snapshot=${encodeURIComponent(snapshot_token)}`
+      : "";
+
   const active =
     streams.find((s) => s.id === active_stream_id) ?? streams[0] ?? null;
 
@@ -63,7 +70,7 @@ export function WatchExperience({
             <button
               type="button"
               className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-900"
-              onClick={() => router.push(`/equipe/${team_id}`)}
+              onClick={() => router.push(`/equipe/${team_id}${snapshot_qs}`)}
             >
               Mosaico do time
             </button>
@@ -75,7 +82,7 @@ export function WatchExperience({
               others.map((stream) => (
                 <Link
                   key={stream.id}
-                  href={`/ver/${team_id}/${stream.id}`}
+                  href={`/ver/${team_id}/${stream.id}${snapshot_qs}`}
                   className="w-44 shrink-0 overflow-hidden rounded-lg border border-zinc-800 bg-black hover:border-violet-600"
                 >
                   <div className="relative aspect-video w-full">

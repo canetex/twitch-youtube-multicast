@@ -31,3 +31,10 @@ model BoardSettings {
   id        String @id @default("default")
   shareSlug String @unique
 }
+
+/// Snapshot publicado do mosaico (times + streams) para links curtos e portáteis.
+model ShareSnapshot {
+  token     String   @id
+  payload   String
+  createdAt DateTime @default(now())
+}

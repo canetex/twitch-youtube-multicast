@@ -15,13 +15,7 @@ type TeamRow = {
   streams: StreamRow[];
 };
 
-export function CadastroForm({
-  initial_share_url,
-  initial_teams,
-}: {
-  initial_share_url: string;
-  initial_teams: TeamRow[];
-}) {
+export function CadastroForm({ initial_teams }: { initial_teams: TeamRow[] }) {
   const [teams, set_teams] = useState<TeamRow[]>(initial_teams);
   const [loading, set_loading] = useState(false);
   const [team_name, set_team_name] = useState("");
@@ -189,11 +183,9 @@ export function CadastroForm({
         <div>
           <h2 className="text-lg font-semibold text-white">Resumo</h2>
           <p className="mt-1 text-sm text-zinc-400">
-            Link para compartilhar todo o mosaico (copie também no topo da página):
+            Use o botão <span className="text-zinc-200">&quot;Copiar link do mosaico&quot;</span> no topo para gerar um
+            endereço que abre todas as streams e times cadastrados (instantâneo do cadastro).
           </p>
-          <div className="mt-2 break-all rounded-lg bg-zinc-950 px-3 py-2 font-mono text-xs text-zinc-300">
-            {initial_share_url}
-          </div>
         </div>
 
         {loading ? (

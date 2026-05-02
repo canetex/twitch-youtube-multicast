@@ -7,13 +7,19 @@ export function StreamTile({
   stream_id,
   player_label,
   source_url,
+  snapshot_token,
 }: {
   team_id: string;
   stream_id: string;
   player_label: string;
   source_url: string;
+  snapshot_token?: string;
 }) {
-  const href = `/ver/${team_id}/${stream_id}`;
+  const snapshot_qs =
+    snapshot_token !== undefined && snapshot_token !== ""
+      ? `?snapshot=${encodeURIComponent(snapshot_token)}`
+      : "";
+  const href = `/ver/${team_id}/${stream_id}${snapshot_qs}`;
 
   return (
     <div className="group relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 shadow-lg">

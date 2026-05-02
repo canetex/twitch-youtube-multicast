@@ -9,5 +9,6 @@ export async function GET(request: Request) {
   return NextResponse.json({
     shareSlug: board.shareSlug,
     shareUrl: `${base}/compartilhar/${board.shareSlug}`,
+    publishEndpoint: `${base}/api/share/publish`,
   });
 }

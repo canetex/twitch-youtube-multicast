@@ -8,17 +8,28 @@ export type TeamSectionModel = {
   streams: { id: string; playerLabel: string; sourceUrl: string }[];
 };
 
-export function TeamSection({ team }: { team: TeamSectionModel }) {
+export function TeamSection({
+  team,
+  share_token,
+}: {
+  team: TeamSectionModel;
+  share_token?: string;
+}) {
+  const snapshot_qs =
+    share_token !== undefined && share_token !== ""
+      ? `?snapshot=${encodeURIComponent(share_token)}`
+      : "";
+
   return (
     <section className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-4 shadow-xl">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-white">
-          <Link href={`/equipe/${team.id}`} className="hover:text-violet-300">
+          <Link href={`/equipe/${team.id}${snapshot_qs}`} className="hover:text-violet-300">
             {team.name}
           </Link>
         </h2>
         <Link
-          href={`/equipe/${team.id}`}
+          href={`/equipe/${team.id}${snapshot_qs}`}
           className="text-sm text-violet-400 hover:text-violet-300"
         >
           Ver só este time →
@@ -35,6 +46,7 @@ export function TeamSection({ team }: { team: TeamSectionModel }) {
               stream_id={stream.id}
               player_label={stream.playerLabel}
               source_url={stream.sourceUrl}
+              snapshot_token={share_token}
             />
           ))}
         </div>

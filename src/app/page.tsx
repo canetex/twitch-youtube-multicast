@@ -1,19 +1,15 @@
 import { SiteHeader } from "@/components/site-header";
 import { TeamSection } from "@/components/team-section";
 import type { TeamSectionModel } from "@/components/team-section";
-import { ensureBoardSettings } from "@/lib/board-settings";
-import { get_site_base_url } from "@/lib/server-base-url";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
-  const [teams_raw, board, base] = await Promise.all([
-    prisma.team.findMany({
-      orderBy: { createdAt: "asc" },
-      include: { streams: { orderBy: { createdAt: "asc" } } },
-    }),
-    ensureBoardSettings(),
-    get_site_base_url(),
-  ]);
+  const teams_raw = await prisma.team.findMany({
+    orderBy: { createdAt: "asc" },
+    include: { streams: { orderBy: { createdAt: "asc" } } },
+  });
 
   const teams: TeamSectionModel[] = teams_raw.map((t) => ({
     id: t.id,
@@ -25,16 +21,15 @@ export default async function HomePage() {
     })),
   }));
 
-  const share_url = `${base}/compartilhar/${board.shareSlug}`;
-
   return (
     <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100">
-      <SiteHeader share_url={share_url} />
+      <SiteHeader copy_share={{ variant: "publish" }} />
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-10 px-4 py-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Todos os times</h1>
           <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-            Mosaico por time. Clique num time para ver só aquele grupo ou numa stream para focar em tela cheia.
+            Mosaico por time. Clique num time para ver só aquele grupo ou numa stream para focar em tela cheia. Use
+            &quot;Copiar link do mosaico&quot; para gerar um URL com todos os times e streams cadastrados neste momento.
           </p>
         </div>
         {teams.length === 0 ? (
