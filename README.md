@@ -1,70 +1,60 @@
-# Twitch e Youtube Multicast
+# Multicast Stream Viewer
 
-Aplicação web para cadastrar **times**, associar **streams** (Twitch ou YouTube) a cada jogador e visualizar um **mosaico** agrupado por time — com foco em tela cheia e link público para espectadores.
+SPA estática (**Vite + React + TypeScript + Tailwind v4**) para ver várias streams **Twitch** e **YouTube** em mosaico, sem backend.
 
-## Funcionalidades
+- **Dark mode**: paleta `slate-950` / `slate-900` / `slate-800`.
+- **Persistência**: `localStorage` (`multicast-stream-viewer:v1`).
+- **Compartilhamento**: estado comprimido com **LZ-string** no query param **`?s=`** — quem abrir o link vê o mesmo mosaico (sem banco de dados).
+- **Embeds**: apenas vídeo (sem chat).
 
-- **Cadastro**: criar times e adicionar URLs de Twitch / YouTube por jogador (`/cadastro`).
-- **Link do mosaico**: botão **“Copiar link do mosaico”** chama `POST /api/share/publish`, grava um snapshot com **todos os times e streams** e devolve um URL curto `/compartilhar/mosaico/[token]` que carrega esse mosaico pré-configurado (links internos usam `?snapshot=` quando necessário). A rota `/compartilhar/[slug]` continua disponível como vista ao vivo do slug da instalação.
-- **Início** (`/`): todos os times em seções; cada seção é um mosaico de players.
-- **Time** (`/equipe/[id]`): apenas as streams daquele time.
-- **Foco** (`/ver/[teamId]/[streamId]`): stream principal em destaque; na barra inferior, as outras streams do mesmo time em mosaico horizontal.
-- **Voltar aos times**: botão no cabeçalho nas páginas de time e de foco.
+## Rotas (HashRouter)
 
-## Requisitos
+| Caminho | Descrição |
+|--------|-----------|
+| `#/` | Grade de cards por time |
+| `#/team/:id` | Mosaico em grid (layout conforme quantidade de canais) |
+| `#/team/:id/focus/:channelId` | ~80% vídeo principal + miniaturas na barra inferior |
+| `#/edit/new` / `#/edit/:id` | Criar ou editar time e URLs |
 
-- Node.js 20+
-- npm
-
-## Desenvolvimento
+## Scripts
 
 ```bash
-cp .env.example .env
-npx prisma migrate dev
 npm install
-npm run dev
-```
-
-Abra [http://localhost:3000](http://localhost:3000).
-
-## Testes
-
-```bash
+npm run dev      # desenvolvimento
+npm run build    # saída em dist/
+npm run preview  # testar build local
 npm test
 ```
 
-## Build
+## Deploy estático
+
+### Netlify / qualquer CDN
+
+Publique a pasta **`dist/`** após `npm run build`.
+
+### GitHub Pages (projeto em `usuario.github.io/repositorio/`)
+
+O Vite precisa do **base path** do repositório:
 
 ```bash
+set VITE_BASE=/nome-do-repo/
 npm run build
-npm start
 ```
 
-## Banco de dados
+Envie o conteúdo de `dist/` para a branch `gh-pages` ou use uma Action; o site ficará em  
+`https://usuario.github.io/nome-do-repo/` com rotas em hash (`#/…`).
 
-SQLite (`DATABASE_URL=file:./dev.db` relativo ao diretório `prisma/`). O arquivo gerado não deve ser commitado.
+**Twitch**: o player exige `parent` igual ao host onde o site está em produção.
 
-Em hospedagem serverless (ex.: Vercel), o sistema de arquivos efêmero não persiste SQLite entre deploys — use um fluxo de migração para Postgres/MySQL ou um volume persistente.
+## Estrutura
 
-## Publicar no GitHub (repositório público)
-
-1. Crie um repositório vazio em GitHub (visibilidade **Public**), sem README inicial se já tiver um localmente.
-2. Na pasta do projeto:
-
-```bash
-git init
-git add .
-git commit -m "[Feature] : Twitch e Youtube Multicast — mosaico por time e link público"
-git branch -M main
-git remote add origin https://github.com/SEU_USUARIO/NOME_DO_REPO.git
-git push -u origin main
 ```
-
-Substitua `SEU_USUARIO` e `NOME_DO_REPO`.
-
-### Twitch embed
-
-O player do Twitch exige o domínio (`parent`) igual ao host onde o site roda. Em produção, use um domínio estável; em desenvolvimento, `localhost` funciona para testes locais.
+src/
+  components/   Header, TeamCard, StreamGrid, StreamPlayer
+  views/        Home, TeamMosaic, ChannelFocus, TeamEditor
+  utils/        embedUrls.ts, urlHandler.ts (LZ), storage.ts
+  context/      AppStateContext.tsx
+```
 
 ## Licença
 
