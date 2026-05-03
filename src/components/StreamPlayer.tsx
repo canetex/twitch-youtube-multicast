@@ -6,7 +6,7 @@ type Props = {
   source_url: string;
   title: string;
   className?: string;
-  /** Mosaico: áudio reduzido para não sobrepor vários players */
+  /** Mosaico: mudo + autoplay; foco: tenta som */
   variant?: "tile" | "focus";
 };
 
@@ -20,22 +20,47 @@ export function StreamPlayer({ source_url, title, className, variant = "tile" }:
     return () => cancelAnimationFrame(id);
   }, []);
 
+  const parsed = useMemo(() => parse_stream_url(source_url), [source_url]);
+
   const src = useMemo(() => {
     if (!parent_host) {
       return null;
     }
-    const parsed = parse_stream_url(source_url);
+    if (parsed.kind === "INVALID") {
+      return null;
+    }
     return build_embed_src(parsed, parent_host, {
       muted: variant === "tile",
+      autoplay: true,
     });
-  }, [source_url, parent_host, variant]);
+  }, [parent_host, variant, parsed]);
 
-  if (!src) {
+  if (!parent_host) {
     return (
       <div
         className={`animate-pulse rounded-lg bg-slate-900 ${className ?? ""}`}
         aria-hidden
       />
+    );
+  }
+
+  if (parsed.kind === "INVALID") {
+    return (
+      <div
+        className={`flex items-center justify-center rounded-lg border border-amber-900/60 bg-slate-900/90 p-3 text-center text-xs text-amber-100/90 ${className ?? ""}`}
+      >
+        {parsed.message}
+      </div>
+    );
+  }
+
+  if (!src) {
+    return (
+      <div
+        className={`flex items-center justify-center rounded-lg bg-slate-900 p-3 text-center text-xs text-slate-500 ${className ?? ""}`}
+      >
+        Não foi possível montar o player.
+      </div>
     );
   }
 

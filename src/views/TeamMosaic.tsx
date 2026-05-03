@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { StreamGrid } from "@/components/StreamGrid";
 import { useTeam } from "@/context/AppStateContext";
@@ -33,9 +33,17 @@ export function TeamMosaic() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6">
-        <p className="text-xs uppercase tracking-wider text-slate-500">Time</p>
-        <h1 className="text-2xl font-bold text-white">{team.name}</h1>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-wider text-slate-500">Time</p>
+          <h1 className="text-2xl font-bold text-white">{team.name}</h1>
+        </div>
+        <Link
+          to={`/edit/${team.id}`}
+          className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700"
+        >
+          Editar time
+        </Link>
       </div>
       <StreamGrid
         channels={team.channels}

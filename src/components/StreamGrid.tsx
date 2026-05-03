@@ -37,7 +37,7 @@ export function StreamGrid({ channels, on_pick_channel }: Props) {
               title={ch.label}
               className="pointer-events-none absolute inset-0 h-full w-full"
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-3">
               <p className="truncate text-sm font-semibold text-white">{ch.label}</p>
               <p className="text-xs text-slate-400">Clique para focar</p>

@@ -12,6 +12,13 @@ type Props = {
 export function Header({ title, share_state }: Props) {
   const location = useLocation();
   const is_home = location.pathname === "/";
+  const team_route = location.pathname.match(/^\/team\/([^/]+)/);
+  const on_edit = location.pathname.startsWith("/edit/");
+  const edit_href = team_route
+    ? `/edit/${team_route[1]}`
+    : on_edit
+      ? location.pathname
+      : "/edit/new";
 
   async function copy_share_link() {
     if (!share_state) {
@@ -42,10 +49,16 @@ export function Header({ title, share_state }: Props) {
         </div>
         <div className="flex items-center gap-2">
           <Link
-            to="/edit/new"
+            to={edit_href}
             className="rounded-lg bg-slate-800 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700"
           >
-            {is_home ? "Novo time" : "Gerenciar"}
+            {is_home
+              ? "Novo time"
+              : team_route
+                ? "Editar time"
+                : on_edit
+                  ? "Editor"
+                  : "Novo time"}
           </Link>
           {share_state && share_state.teams.length > 0 ? (
             <button

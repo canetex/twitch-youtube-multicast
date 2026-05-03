@@ -20,8 +20,14 @@ describe("build_embed_src", () => {
     if (p.kind !== "TWITCH_CHANNEL") {
       throw new Error("parse");
     }
-    const src = build_embed_src(p, "localhost");
+    const src = build_embed_src(p, "localhost", { muted: true, autoplay: true });
     expect(src).toContain("player.twitch.tv");
     expect(src).toContain("parent=localhost");
+    expect(src).toContain("muted=true");
+  });
+
+  it("YouTube shorts", () => {
+    const r = parse_stream_url("https://youtube.com/shorts/dQw4w9WgXcQ");
+    expect(r.kind).toBe("YOUTUBE_VIDEO");
   });
 });

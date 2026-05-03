@@ -58,7 +58,7 @@ function parse_twitch_path(u: URL): ParsedEmbed {
   }
 
   const channel = segments[0].toLowerCase();
-  if (!/^[a-z0-9_]{3,25}$/i.test(channel)) {
+  if (!/^[a-z0-9_-]{2,25}$/i.test(channel)) {
     return { kind: "INVALID", platform: "UNKNOWN", message: "Nome de canal Twitch inválido" };
   }
 
@@ -69,6 +69,11 @@ function parse_youtube_url(u: URL): ParsedEmbed {
   const v_param = u.searchParams.get("v");
   if (v_param && /^[\w-]{6,}$/.test(v_param)) {
     return { kind: "YOUTUBE_VIDEO", platform: "YOUTUBE", videoId: v_param };
+  }
+
+  const shorts_match = u.pathname.match(/^\/shorts\/([\w-]{6,})/);
+  if (shorts_match) {
+    return { kind: "YOUTUBE_VIDEO", platform: "YOUTUBE", videoId: shorts_match[1] };
   }
 
   if (u.hostname.replace(/^www\./i, "").toLowerCase() === "youtu.be") {
@@ -104,23 +109,52 @@ function parse_youtube_url(u: URL): ParsedEmbed {
   };
 }
 
+/** Domínios extras aceitos pelo player Twitch (localhost vs 127.0.0.1). */
+export function twitch_parent_query(primary_host: string): string {
+  const hosts = new Set<string>([primary_host]);
+  if (primary_host === "localhost") {
+    hosts.add("127.0.0.1");
+  }
+  if (primary_host === "127.0.0.1") {
+    hosts.add("localhost");
+  }
+  return [...hosts].map((h) => `parent=${encodeURIComponent(h)}`).join("&");
+}
+
 export function build_embed_src(
   parsed: ParsedEmbed,
   parent_hostname: string,
-  opts?: { muted?: boolean },
+  opts?: { muted?: boolean; autoplay?: boolean },
 ): string | null {
-  const muted_extra =
-    opts?.muted === true ? "&muted=true" : opts?.muted === false ? "&muted=false" : "";
+  const muted =
+    opts?.muted === true ? true : opts?.muted === false ? false : undefined;
+  const autoplay = opts?.autoplay === true;
 
   switch (parsed.kind) {
-    case "TWITCH_CHANNEL":
-      return `https://player.twitch.tv/?channel=${encodeURIComponent(parsed.channel)}&parent=${encodeURIComponent(parent_hostname)}${muted_extra || "&muted=false"}`;
-    case "TWITCH_VOD":
-      return `https://player.twitch.tv/?video=${encodeURIComponent(parsed.videoId)}&parent=${encodeURIComponent(parent_hostname)}${muted_extra}`;
-    case "YOUTUBE_VIDEO":
-      return `https://www.youtube.com/embed/${encodeURIComponent(parsed.videoId)}?rel=0`;
-    case "YOUTUBE_LIVE_CHANNEL":
-      return `https://www.youtube.com/embed/live_stream?channel=${encodeURIComponent(parsed.channelId)}`;
+    case "TWITCH_CHANNEL": {
+      const parents_q = twitch_parent_query(parent_hostname);
+      const muted_q =
+        muted === true ? "&muted=true" : muted === false ? "&muted=false" : "&muted=false";
+      const autoplay_q = autoplay ? "&autoplay=true" : "";
+      return `https://player.twitch.tv/?channel=${encodeURIComponent(parsed.channel)}&${parents_q}${muted_q}${autoplay_q}`;
+    }
+    case "TWITCH_VOD": {
+      const parents_q = twitch_parent_query(parent_hostname);
+      const muted_q =
+        muted === true ? "&muted=true" : muted === false ? "&muted=false" : "&muted=true";
+      const autoplay_q = autoplay ? "&autoplay=true" : "";
+      return `https://player.twitch.tv/?video=${encodeURIComponent(parsed.videoId)}&${parents_q}${muted_q}${autoplay_q}`;
+    }
+    case "YOUTUBE_VIDEO": {
+      const mute_q = muted === true ? 1 : muted === false ? 0 : 1;
+      const auto_q = autoplay ? 1 : 0;
+      return `https://www.youtube.com/embed/${encodeURIComponent(parsed.videoId)}?rel=0&autoplay=${auto_q}&mute=${mute_q}`;
+    }
+    case "YOUTUBE_LIVE_CHANNEL": {
+      const mute_q = muted === true ? 1 : muted === false ? 0 : 1;
+      const auto_q = autoplay ? 1 : 0;
+      return `https://www.youtube.com/embed/live_stream?channel=${encodeURIComponent(parsed.channelId)}&autoplay=${auto_q}&mute=${mute_q}`;
+    }
     default:
       return null;
   }

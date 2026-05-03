@@ -28,56 +28,55 @@ export function ChannelFocus() {
   const others = team.channels.filter((c) => c.id !== channel.id);
 
   return (
-    <div className="flex min-h-[calc(100vh-56px)] flex-col bg-black">
-      <div className="relative flex min-h-[78vh] flex-1 items-center justify-center bg-black">
-        <StreamPlayer
-          variant="focus"
-          source_url={channel.url}
-          title={channel.label}
-          className="h-full w-full max-h-[78vh] max-w-[100vw]"
-        />
-        <div className="pointer-events-none absolute left-4 top-4 rounded-lg bg-black/70 px-3 py-2 text-sm text-white backdrop-blur">
-          <div className="font-semibold">{team.name}</div>
-          <div className="text-slate-300">{channel.label}</div>
+    <div className="relative flex min-h-[calc(100vh-3.5rem)] flex-col bg-black">
+      <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-black px-2 pb-24 pt-2">
+        <div className="relative mx-auto aspect-video w-full max-w-[min(100vw,calc((100vh-7rem)*16/9))]">
+          <StreamPlayer
+            variant="focus"
+            source_url={channel.url}
+            title={channel.label}
+            className="absolute inset-0 z-0 h-full w-full rounded-sm border-0"
+          />
         </div>
-      </div>
 
-      <div className="border-t border-slate-800 bg-slate-950 px-3 py-3">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs uppercase tracking-wide text-slate-500">Outros canais</span>
-            <button
-              type="button"
-              className="rounded-lg border border-slate-700 px-2 py-1 text-xs text-slate-200 hover:bg-slate-900"
-              onClick={() => void navigate(`/team/${team.id}`)}
-            >
-              Mosaico do time
-            </button>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-1">
-            {others.length === 0 ? (
-              <span className="text-sm text-slate-500">Nenhum outro canal.</span>
-            ) : (
-              others.map((stream) => (
+        <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-md bg-black/65 px-2.5 py-1.5 text-sm text-white backdrop-blur-sm">
+          <div className="font-semibold leading-tight">{team.name}</div>
+          <div className="text-xs leading-tight text-slate-300">{channel.label}</div>
+        </div>
+
+        <button
+          type="button"
+          className="pointer-events-auto absolute right-3 top-3 z-10 rounded-md border border-white/20 bg-black/45 px-2 py-1 text-xs text-white backdrop-blur-sm hover:bg-black/65"
+          onClick={() => void navigate(`/team/${team.id}`)}
+        >
+          Mosaico
+        </button>
+
+        {others.length > 0 ? (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center pb-2 pt-10">
+            <div className="pointer-events-auto flex max-w-full gap-1.5 overflow-x-auto px-2 pb-1 sm:gap-2">
+              {others.map((stream) => (
                 <Link
                   key={stream.id}
                   to={`/team/${team.id}/focus/${stream.id}`}
-                  className="w-44 shrink-0 overflow-hidden rounded-lg border border-slate-800 bg-black hover:border-violet-600"
+                  className="w-[72px] shrink-0 overflow-hidden rounded-md shadow-lg shadow-black/50 ring-1 ring-white/25 transition hover:ring-violet-400 sm:w-24"
                 >
-                  <div className="relative aspect-video w-full">
+                  <div className="relative aspect-video w-full bg-black">
                     <StreamPlayer
                       variant="tile"
                       source_url={stream.url}
                       title={stream.label}
-                      className="pointer-events-none absolute inset-0 h-full w-full"
+                      className="pointer-events-none absolute inset-0 h-full w-full border-0"
                     />
                   </div>
-                  <div className="truncate px-2 py-1 text-xs text-slate-200">{stream.label}</div>
+                  <div className="max-w-[72px] truncate px-0.5 py-0.5 text-center text-[9px] leading-none text-white drop-shadow-md sm:max-w-24 sm:text-[10px]">
+                    {stream.label}
+                  </div>
                 </Link>
-              ))
-            )}
+              ))}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </div>
   );
