@@ -1,8 +1,8 @@
 # Documentação: https://docs.netlify.com/configure-builds/file-based-configuration/
 #
-# SPA estática (Vite → dist/). Se no painel Netlify existir o plugin “Next.js Runtime”
-# (@netlify/plugin-nextjs), remova-o em Site configuration → Build & deploy → Plugins:
-# caso contrário o build pode passar e o deploy falhar (“does not contain Next.js build output”).
+# SPA estática (Vite → dist/). O Netlify pode injetar @netlify/plugin-nextjs (log: “Using Next.js Runtime”)
+# mesmo sem aparecer em Build plugins. NETLIFY_NEXT_PLUGIN_SKIP desativa o runtime na build:
+# https://docs.netlify.com/build/configure-builds/environment-variables/#netlify-configuration-variables
 
 [build]
   command = "npm run build"
@@ -10,3 +10,4 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
