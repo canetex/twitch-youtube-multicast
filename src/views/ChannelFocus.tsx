@@ -1,7 +1,19 @@
+import type { CSSProperties } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { StreamPlayer } from "@/components/StreamPlayer";
 import { useTeam } from "@/context/AppStateContext";
+
+/** Área útil abaixo do header (~3.5rem) e acima da faixa de miniaturas (~5.5rem). */
+const FOCUS_STYLE: CSSProperties = {
+  aspectRatio: "16 / 9",
+  /* Largura limitada pela viewport e pela altura disponível (16:9). */
+  width: "min(calc(100vw - 16px), calc((100dvh - 9rem) * 16 / 9))",
+  maxWidth: "calc(100vw - 16px)",
+  maxHeight: "calc(100dvh - 9rem)",
+  marginLeft: "auto",
+  marginRight: "auto",
+};
 
 export function ChannelFocus() {
   const { teamId, channelId } = useParams<{ teamId: string; channelId: string }>();
@@ -28,9 +40,10 @@ export function ChannelFocus() {
   const others = team.channels.filter((c) => c.id !== channel.id);
 
   return (
-    <div className="relative flex min-h-[calc(100vh-3.5rem)] flex-col bg-black">
-      <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-black px-2 pb-24 pt-2">
-        <div className="relative mx-auto aspect-video w-full max-w-[min(100vw,calc((100vh-7rem)*16/9))]">
+    <div className="relative flex min-h-[calc(100dvh-3.5rem)] flex-col bg-black">
+      {/* Coluna full-width evita flex-row encolher o player ao tamanho do conteúdo */}
+      <div className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden px-2 pb-28 pt-2">
+        <div className="relative w-full shrink-0" style={FOCUS_STYLE}>
           <StreamPlayer
             variant="focus"
             source_url={channel.url}
@@ -53,7 +66,10 @@ export function ChannelFocus() {
         </button>
 
         {others.length > 0 ? (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center pb-2 pt-10">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center pb-2 pt-12">
+            <span className="pointer-events-none mb-1 text-[10px] font-medium uppercase tracking-wide text-white/70 drop-shadow-md">
+              Outros canais
+            </span>
             <div className="pointer-events-auto flex max-w-full gap-1.5 overflow-x-auto px-2 pb-1 sm:gap-2">
               {others.map((stream) => (
                 <Link
